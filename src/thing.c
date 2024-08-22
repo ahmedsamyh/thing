@@ -1,27 +1,19 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
+#include <body.h>
+#include <config.h>
+#include <segment.h>
+#include <arm.h>
+
 #define COMMONLIB_IMPLEMENTATION
 #include <commonlib.h>
 
-#define WIDTH 1280
-#define HEIGHT 720
-#define GRAVITY 900.8f
-
-#define DEBUG_TEXT(str, x, font_size, color) DrawText(str, x, y, font_size, WHITE); y+=font_size
-
-STRUCT(Body);
-
-struct Body {
-    Vector3 pos, target, vel, acc;
-    float radius, speed;
-    Color color;
-};
-
-void draw_body(Body* body, bool debug);
-void update_body(Body* body);
-void do_physics_to_body(Body* body);
-void control_body(Body* body);
+void add_arm(Arm** arms, Vector2 pos, float length) {
+    Arm a = make_arm(200, length);
+    a.pos = CLITERAL(Vector3) { pos.x, pos.y, 0.f };
+    arrput(*arms, a);
+}
 
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Thing");
@@ -36,11 +28,14 @@ int main(void) {
         .color = YELLOW,
     };
 
+    Arm* arms = NULL; // @dynamic-array
+
     b.target = b.pos;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RED);
+        Vector2 mpos = GetMousePosition();
 
         if (IsKeyPressed(KEY_TAB)) {
             DEBUG_DRAW = !DEBUG_DRAW;
@@ -48,89 +43,43 @@ int main(void) {
 
         // TMP
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            b.pos.z = -(b.pos.y - GetMouseY());
+            add_arm(&arms, mpos, 10.f);
         }
+
+        //UPDATE////////////////////////////////////////////////////////////////////////////////////////////
 
         control_body(&b);
         update_body(&b);
+
+        for (int i = 0; i < arrlen(arms); ++i) {
+            Arm* arm = &arms[i];
+            arm->pos.x = mpos.x; arm->pos.y = mpos.y;
+            update_arm(arm);
+        }
+
+        //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
+        for (int i = 0; i < arrlen(arms); ++i) {
+            Arm* arm = &arms[i];
+            draw_arm(arm, DEBUG_DRAW);
+        }
+
         draw_body(&b, DEBUG_DRAW);
 
         // DEBUG
         int y = 0;
         Arena_reset(&str_arena);
+        cstr fps_str = Arena_alloc_str(str_arena, "FPS: %d", GetFPS());
+        DEBUG_TEXT(fps_str, 0, 20, WHITE);
         cstr pos_str = Arena_alloc_str(str_arena, "pos: %.2f, %.2f, %.2f", b.pos.x, b.pos.y, b.pos.z);
         DEBUG_TEXT(pos_str, 0, 20, WHITE);
+        cstr arms_count_str = Arena_alloc_str(str_arena, "arms_count: %zu", arrlenu(arms));
+        DEBUG_TEXT(arms_count_str, 0, 20, WHITE);
 
         EndDrawing();
     }
 
     Arena_free(&str_arena);
+    arrfree(arms);
     CloseWindow();
     return 0;
-}
-
-void draw_body(Body* body, bool debug) {
-    // shadow
-    Vector2 l = { body->pos.x - body->radius, body->pos.y };
-    Vector2 r = { body->pos.x + body->radius, body->pos.y };
-    DrawLineV(l, r, BLACK);
-    Vector2 t = { body->pos.x, body->pos.y - body->radius*0.5f };
-    Vector2 b = { body->pos.x, body->pos.y + body->radius*0.5f };
-    DrawLineV(t, b, BLACK);
-    Vector2 zv = { 0.f, body->pos.z };
-    Vector2 pos2 = { body->pos.x, body->pos.y };
-    DrawCircleV(Vector2Add(pos2, zv), body->radius, body->color);
-    if (debug) {
-        Vector2 target2 = { body->target.x, body->target.y };
-        DrawCircleV(target2, 2.f, BLUE);
-    }
-}
-
-void update_body(Body* body) {
-    const float rate = 0.99f;
-    const float delta = GetFrameTime();
-    body->pos.x = Lerp(body->pos.x, body->target.x, rate*delta);
-    body->pos.y = Lerp(body->pos.y, body->target.y, rate*delta);
-
-    // TMP
-    if (body->pos.z < 0) body->acc.z += GRAVITY * delta;
-    if (body->pos.z > 0) body->vel.z *= -0.99f;
-
-    do_physics_to_body(body);
-}
-
-void do_physics_to_body(Body* body) {
-    const float delta = GetFrameTime();
-    body->vel = Vector3Add(body->vel, body->acc);
-    body->pos = Vector3Add(body->pos, Vector3Scale(body->vel, delta));
-    body->acc = Vector3Scale(body->acc, 0.f);
-}
-
-void control_body(Body* body) {
-    Vector3 dir = {0};
-    const float delta = GetFrameTime();
-    if (IsKeyDown(KEY_LEFT)) {
-        dir.x--;
-    }
-    if (IsKeyDown(KEY_RIGHT)) {
-        dir.x++;
-    }
-    if (IsKeyDown(KEY_UP)) {
-        dir.y--;
-    }
-    if (IsKeyDown(KEY_DOWN)) {
-        dir.y++;
-    }
-
-    // TMP
-    if (IsKeyDown(KEY_Z)) {
-        body->pos.z += 100.f * delta;
-    }
-    if (IsKeyDown(KEY_X)) {
-        body->pos.z -= 100.f * delta;
-    }
-
-    dir = Vector3Normalize(dir);
-
-    body->target = Vector3Add(body->target, Vector3Scale(dir, delta * body->speed));
 }

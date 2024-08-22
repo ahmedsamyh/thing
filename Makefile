@@ -2,5 +2,5 @@ CC := gcc
 CFLAGS := -Wextra -Wall -ggdb -Iinclude
 LIBS := -Llib -lraylib -lm
 
-thing: src/thing.c
+thing: src/*.c
 	${CC} ${CFLAGS} -o $@ $^ ${LIBS}
