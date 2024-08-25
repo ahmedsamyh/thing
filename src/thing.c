@@ -10,13 +10,6 @@
 #define COMMONLIB_IMPLEMENTATION
 #include <commonlib.h>
 
-void add_arm(Arm** arms, Vector2 pos, float length) {
-    Arm a = {0};
-    init_arm(&a, 200, length);
-    a.start = pos;
-    arrput(*arms, a);
-}
-
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Thing");
 
@@ -25,37 +18,31 @@ int main(void) {
 
     Bug b = make_bug(CLITERAL(Vector2) {WIDTH*0.5f, HEIGHT*0.75f});
 
-    Arm* arms = NULL; // @dynamic-array
+    /* Arm a = {0}; */
+    /* init_arm(&a, 10, 50.f); */
+    /* Vector2 target = {100.f, 100.f}; */
 
     while (!WindowShouldClose()) {
         BeginDrawing();
-        ClearBackground(RED);
-        Vector2 mpos = GetMousePosition();
+        ClearBackground(GetColor(0x181818FF));
+        /* Vector2 mpos = GetMousePosition(); */
 
         if (IsKeyPressed(KEY_TAB)) {
             DEBUG_DRAW = !DEBUG_DRAW;
         }
 
-        // TMP
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            add_arm(&arms, mpos, 10.f);
-        }
-
         //UPDATE////////////////////////////////////////////////////////////////////////////////////////////
+
+        /* a.start = mpos; */
+        /* update_arm_s2e(&a); */
+        /* a.end = target; */
+        /* update_arm_e2s(&a); */
 
         update_bug(&b);
 
-        for (int i = 0; i < arrlen(arms); ++i) {
-            Arm* arm = &arms[i];
-            arm->start.x = mpos.x; arm->start.y = mpos.y;
-            update_arm_s2e(arm);
-        }
-
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
-        for (int i = 0; i < arrlen(arms); ++i) {
-            Arm* arm = &arms[i];
-            draw_arm(arm, DEBUG_DRAW);
-        }
+        /* draw_arm(&a, DEBUG_DRAW); */
+        /* DrawCircleV(target, 12.f, RED); */
 
         draw_bug(&b, DEBUG_DRAW);
 
@@ -68,14 +55,16 @@ int main(void) {
         DEBUG_TEXT(pos_str, 0, 20, WHITE);
         cstr last_dir_str = Arena_alloc_str(str_arena, "last_dir: %.2f, %.2f", b.body.last_dir.x, b.body.last_dir.y);
         DEBUG_TEXT(last_dir_str, 0, 20, WHITE);
-        cstr arms_count_str = Arena_alloc_str(str_arena, "arms_count: %zu", arrlenu(arms));
-        DEBUG_TEXT(arms_count_str, 0, 20, WHITE);
+
+        cstr dist_to_end_anchor_str = Arena_alloc_str(str_arena, "dist_to_end_anchor: %f / %f", b.dist_to_end_anchor[0], BUG_ARM_END_ANCHOR_MAX_DIST);
+        DEBUG_TEXT(dist_to_end_anchor_str, 0, 20, WHITE);
+        cstr bug_arm_state_str = Arena_alloc_str(str_arena, "bug_arm_state: %s", bug_arm_state_as_str(b.arm_states[0]));
+        DEBUG_TEXT(bug_arm_state_str, 0, 20, WHITE);
 
         EndDrawing();
     }
 
     Arena_free(&str_arena);
-    arrfree(arms);
     CloseWindow();
     return 0;
 }
