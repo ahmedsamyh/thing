@@ -9,11 +9,12 @@ struct Arm {
     Segment* segments;
     float segment_length;
     size_t segment_count;
-    Vector3 pos;
+    Vector2 start, end;
 };
 
-Arm make_arm(size_t seg_count, float seg_len);
-void update_arm(Arm* arm);
+void init_arm(Arm* arm, size_t seg_count, float seg_len);
+void update_arm_s2e(Arm* arm);
+void update_arm_e2s(Arm* arm);
 void draw_arm(Arm* arm, bool debug);
 void free_arm(Arm* arm);
 

@@ -5,13 +5,15 @@
 #include <config.h>
 #include <segment.h>
 #include <arm.h>
+#include <bug.h>
 
 #define COMMONLIB_IMPLEMENTATION
 #include <commonlib.h>
 
 void add_arm(Arm** arms, Vector2 pos, float length) {
-    Arm a = make_arm(200, length);
-    a.pos = CLITERAL(Vector3) { pos.x, pos.y, 0.f };
+    Arm a = {0};
+    init_arm(&a, 200, length);
+    a.start = pos;
     arrput(*arms, a);
 }
 
@@ -21,16 +23,9 @@ int main(void) {
     bool DEBUG_DRAW = false;
     Arena str_arena = Arena_make(0);
 
-    Body b = {
-        .pos = { WIDTH*0.5f, HEIGHT * 0.85f , 0.f},
-        .radius = 32.f,
-        .speed = 200.f,
-        .color = YELLOW,
-    };
+    Bug b = make_bug(CLITERAL(Vector2) {WIDTH*0.5f, HEIGHT*0.75f});
 
     Arm* arms = NULL; // @dynamic-array
-
-    b.target = b.pos;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -48,13 +43,12 @@ int main(void) {
 
         //UPDATE////////////////////////////////////////////////////////////////////////////////////////////
 
-        control_body(&b);
-        update_body(&b);
+        update_bug(&b);
 
         for (int i = 0; i < arrlen(arms); ++i) {
             Arm* arm = &arms[i];
-            arm->pos.x = mpos.x; arm->pos.y = mpos.y;
-            update_arm(arm);
+            arm->start.x = mpos.x; arm->start.y = mpos.y;
+            update_arm_s2e(arm);
         }
 
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,15 +57,17 @@ int main(void) {
             draw_arm(arm, DEBUG_DRAW);
         }
 
-        draw_body(&b, DEBUG_DRAW);
+        draw_bug(&b, DEBUG_DRAW);
 
         // DEBUG
         int y = 0;
         Arena_reset(&str_arena);
         cstr fps_str = Arena_alloc_str(str_arena, "FPS: %d", GetFPS());
         DEBUG_TEXT(fps_str, 0, 20, WHITE);
-        cstr pos_str = Arena_alloc_str(str_arena, "pos: %.2f, %.2f, %.2f", b.pos.x, b.pos.y, b.pos.z);
+        cstr pos_str = Arena_alloc_str(str_arena, "pos: %.2f, %.2f", b.body.pos.x, b.body.pos.y);
         DEBUG_TEXT(pos_str, 0, 20, WHITE);
+        cstr last_dir_str = Arena_alloc_str(str_arena, "last_dir: %.2f, %.2f", b.body.last_dir.x, b.body.last_dir.y);
+        DEBUG_TEXT(last_dir_str, 0, 20, WHITE);
         cstr arms_count_str = Arena_alloc_str(str_arena, "arms_count: %zu", arrlenu(arms));
         DEBUG_TEXT(arms_count_str, 0, 20, WHITE);
 

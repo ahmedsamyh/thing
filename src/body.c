@@ -12,11 +12,10 @@ void draw_body(Body* body, bool debug) {
     Vector2 b = { body->pos.x, body->pos.y + body->radius*0.5f };
     DrawLineV(t, b, BLACK);
 
-    Vector2 pos2 = vec3_to_vec2(body->pos);
-    DrawCircleV(pos2, body->radius, body->color);
+    DrawCircleV(body->pos, body->radius, body->color);
     if (debug) {
-        Vector2 target2 = vec3_to_vec2(body->target);
-        DrawCircleV(target2, 2.f, BLUE);
+        DrawCircleV(body->target, 2.f, BLUE);
+        DrawLineV(body->pos, Vector2Add(body->pos, Vector2Scale(body->last_dir, 100.f)), WHITE);
     }
 }
 
@@ -26,48 +25,43 @@ void update_body(Body* body) {
     body->pos.x = Lerp(body->pos.x, body->target.x, rate*delta);
     body->pos.y = Lerp(body->pos.y, body->target.y, rate*delta);
 
-    // TMP
-    if (body->pos.z < 0) body->acc.z += GRAVITY * delta;
-    if (body->pos.z > 0) {
-        body->pos.z = 0;
-        body->vel.z *= -0.8f;
+    /* do_physics_to_body(body); */
+
+    if (body->moving) {
+        body->last_dir = Vector2Normalize(Vector2Subtract(body->target, body->pos));
     }
-
-    do_physics_to_body(body);
 }
 
-void do_physics_to_body(Body* body) {
-    const float delta = GetFrameTime();
-    body->vel = Vector3Add(body->vel, body->acc);
-    body->pos = Vector3Add(body->pos, Vector3Scale(body->vel, delta));
-    body->acc = Vector3Scale(body->acc, 0.f);
-}
+/* void do_physics_to_body(Body* body) { */
+/*     const float delta = GetFrameTime(); */
+/*     body->vel = Vector2Add(body->vel, body->acc); */
+/*     body->pos = Vector2Add(body->pos, Vector2Scale(body->vel, delta)); */
+/*     body->acc = Vector2Scale(body->acc, 0.f); */
+/* } */
 
 void control_body(Body* body) {
-    Vector3 dir = {0};
+    Vector2 dir = {0};
     const float delta = GetFrameTime();
+    body->moving = false;
+
     if (IsKeyDown(KEY_LEFT)) {
         dir.x--;
+        body->moving = true;
     }
     if (IsKeyDown(KEY_RIGHT)) {
         dir.x++;
+        body->moving = true;
     }
     if (IsKeyDown(KEY_UP)) {
         dir.y--;
+        body->moving = true;
     }
     if (IsKeyDown(KEY_DOWN)) {
         dir.y++;
+        body->moving = true;
     }
 
-    // TMP
-    if (IsKeyDown(KEY_Z)) {
-        body->pos.z += 100.f * delta;
-    }
-    if (IsKeyDown(KEY_X)) {
-        body->pos.z -= 100.f * delta;
-    }
+    dir = Vector2Normalize(dir);
 
-    dir = Vector3Normalize(dir);
-
-    body->target = Vector3Add(body->target, Vector3Scale(dir, delta * body->speed));
+    body->target = Vector2Add(body->target, Vector2Scale(dir, delta * body->speed));
 }

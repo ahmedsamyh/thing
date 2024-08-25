@@ -7,9 +7,11 @@
 STRUCT(Body);
 
 struct Body {
-    Vector3 pos, target, vel, acc;
+    Vector2 pos, target, vel, acc;
+    Vector2 last_dir;
     float radius, speed;
     Color color;
+    bool moving;
 };
 
 void draw_body(Body* body, bool debug);
