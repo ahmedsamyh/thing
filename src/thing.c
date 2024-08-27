@@ -1,10 +1,11 @@
 #include <raylib.h>
 #include <raymath.h>
+#include <momomath.h>
 #include <stdio.h>
 #include <body.h>
 #include <config.h>
 #include <segment.h>
-#include <arm.h>
+#include <leg.h>
 #include <bug.h>
 
 #define COMMONLIB_IMPLEMENTATION
@@ -18,9 +19,9 @@ int main(void) {
 
     Bug b = make_bug(CLITERAL(Vector2) {WIDTH*0.5f, HEIGHT*0.75f});
 
-    /* Arm a = {0}; */
-    /* init_arm(&a, 10, 50.f); */
-    /* Vector2 target = {100.f, 100.f}; */
+    /* Leg a = {0}; */
+    /* init_leg(&a, 10, 50.f); */
+    /* Vector2 target = {WIDTH*0.5f, HEIGHT*0.5f}; */
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -34,14 +35,14 @@ int main(void) {
         //UPDATE////////////////////////////////////////////////////////////////////////////////////////////
 
         /* a.start = mpos; */
-        /* update_arm_s2e(&a); */
+        /* update_leg_s2e(&a); */
         /* a.end = target; */
-        /* update_arm_e2s(&a); */
+        /* update_leg_e2s(&a); */
 
         update_bug(&b);
 
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
-        /* draw_arm(&a, DEBUG_DRAW); */
+        /* draw_leg(&a, DEBUG_DRAW); */
         /* DrawCircleV(target, 12.f, RED); */
 
         draw_bug(&b, DEBUG_DRAW);
@@ -56,10 +57,8 @@ int main(void) {
         cstr last_dir_str = Arena_alloc_str(str_arena, "last_dir: %.2f, %.2f", b.body.last_dir.x, b.body.last_dir.y);
         DEBUG_TEXT(last_dir_str, 0, 20, WHITE);
 
-        cstr dist_to_end_anchor_str = Arena_alloc_str(str_arena, "dist_to_end_anchor: %f / %f", b.dist_to_end_anchor[0], BUG_ARM_END_ANCHOR_MAX_DIST);
-        DEBUG_TEXT(dist_to_end_anchor_str, 0, 20, WHITE);
-        cstr bug_arm_state_str = Arena_alloc_str(str_arena, "bug_arm_state: %s", bug_arm_state_as_str(b.arm_states[0]));
-        DEBUG_TEXT(bug_arm_state_str, 0, 20, WHITE);
+        cstr bug_leg_state_str = Arena_alloc_str(str_arena, "bug_leg_state: %s", bug_leg_state_as_str(b.leg_states[0]));
+        DEBUG_TEXT(bug_leg_state_str, 0, 20, WHITE);
 
         EndDrawing();
     }

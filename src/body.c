@@ -20,7 +20,7 @@ void draw_body(Body* body, bool debug) {
 }
 
 void update_body(Body* body) {
-    const float rate = 2.f;
+    const float rate = 10.f;
     const float delta = GetFrameTime();
     body->pos.x = Lerp(body->pos.x, body->target.x, rate*delta);
     body->pos.y = Lerp(body->pos.y, body->target.y, rate*delta);
@@ -64,4 +64,8 @@ void control_body(Body* body) {
     dir = Vector2Normalize(dir);
 
     body->target = Vector2Add(body->target, Vector2Scale(dir, delta * body->speed));
+
+    if (IsKeyPressed(KEY_Z)) {
+        body->target = Vector2Add(body->target, Vector2Scale(body->last_dir, body->speed));
+    }
 }

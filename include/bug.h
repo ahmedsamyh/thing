@@ -1,32 +1,31 @@
 #ifndef __BUG_H__
 #define __BUG_H__
 
-#include <arm.h>
+#include <leg.h>
 #include <body.h>
 
 STRUCT(Bug);
-ENUM(Bug_arm_state);
+ENUM(Bug_leg_state);
 
-#define BUG_ARM_SEG_COUNT 10
-#define BUG_ARM_COUNT 2
-#define BUG_RADIUS 32.f
-#define BUG_ARM_LENGTH 32.f
-#define BUG_ARM_END_ANCHOR_LENGTH (BUG_ARM_LENGTH * 1.85f)
-#define BUG_ARM_END_ANCHOR_MAX_DIST (BUG_ARM_LENGTH * (BUG_ARM_SEG_COUNT-1)) // max distance the arm end can be from the arm anchor
+#define BUG_LEG_SEG_COUNT 3
+#define BUG_LEG_COUNT 2
+#define BUG_RADIUS 16.f
+#define BUG_LEG_LENGTH 64.f
+#define BUG_LEG_END_ANCHOR_LENGTH (BUG_LEG_LENGTH * 1.f)
+#define BUG_LEG_END_ANCHOR_MAX_DIST (BUG_LEG_LENGTH * (BUG_LEG_SEG_COUNT-1)) // max distance the leg end can be from the leg anchor
 
-enum Bug_arm_state {
-    BUG_ARM_STATE_IDLE,   // arm end does not do anything
-    BUG_ARM_STATE_FOLLOW, // arm end reaches the arm anchor
-    BUG_ARM_STATE_COUNT
+enum Bug_leg_state {
+    BUG_LEG_STATE_IDLE,   // leg end does not do anything
+    BUG_LEG_STATE_MOVE, // leg end reaches the leg anchor
+    BUG_LEG_STATE_COUNT
 };
 
 struct Bug {
     Body body;
-    Arm arms[BUG_ARM_COUNT];
-    Vector2 arm_end_anchors[BUG_ARM_COUNT];
-    Bug_arm_state arm_states[BUG_ARM_COUNT];
-    Vector2 arm_end_targets[BUG_ARM_COUNT];
-    float dist_to_end_anchor[BUG_ARM_COUNT];
+    Leg legs[BUG_LEG_COUNT];
+    Vector2 leg_end_anchors[BUG_LEG_COUNT];
+    Bug_leg_state leg_states[BUG_LEG_COUNT];
+    Vector2 leg_end_targets[BUG_LEG_COUNT];
 };
 
 Bug make_bug(Vector2 pos);
@@ -34,6 +33,6 @@ void update_bug(Bug* bug);
 void draw_bug(Bug* bug, bool debug);
 
 // misc
-cstr bug_arm_state_as_str(Bug_arm_state s);
+cstr bug_leg_state_as_str(Bug_leg_state s);
 
 #endif // __BUG_H__

@@ -16,5 +16,7 @@ float map(float value, float from_min, float from_max, float to_min, float to_ma
 
 // Raylib
 Vector2 vector2_from_degrees(float deg);
+float vector2_radians(Vector2 v);
+float vector2_degrees(Vector2 v);
 
 #endif /* _MATH_H_ */

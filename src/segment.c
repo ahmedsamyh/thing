@@ -14,5 +14,5 @@ void fix_seg_a_to_b(Segment* seg) {
 
 void draw_segment(Segment* seg, bool debug) {
     (void)debug;
-    DrawLineV(seg->a, seg->b, GREEN);
+    DrawLineV(seg->a, seg->b, GetColor(0xB8BB26FF));
 }
