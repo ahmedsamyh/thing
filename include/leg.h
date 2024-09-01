@@ -13,8 +13,8 @@ struct Leg {
 };
 
 void init_leg(Leg* leg, size_t seg_count, float seg_len);
-void update_leg_s2e(Leg* leg);
-void update_leg_e2s(Leg* leg);
+void update_leg_end_to_start(Leg* leg);
+void update_leg_start_to_end(Leg* leg);
 void draw_leg(Leg* leg, bool debug);
 void free_leg(Leg* leg);
 

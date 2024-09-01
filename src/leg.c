@@ -15,7 +15,7 @@ void init_leg(Leg* a, size_t seg_count, float seg_len) {
 //     /         ^
 //    /          |
 //   b|a---------b
-void update_leg_s2e(Leg* leg) {
+void update_leg_end_to_start(Leg* leg) {
     ASSERT(leg->segments);
     leg->segments[0].a = leg->start;
     fix_seg_b_to_a(&leg->segments[0]);
@@ -28,7 +28,7 @@ void update_leg_s2e(Leg* leg) {
     leg->end = leg->segments[arrlenu(leg->segments)-1].b;
 }
 
-void update_leg_e2s(Leg* leg) {
+void update_leg_start_to_end(Leg* leg) {
     ASSERT(leg->segments);
     leg->segments[arrlenu(leg->segments)-1].b = leg->end;
     fix_seg_a_to_b(&leg->segments[arrlenu(leg->segments)-1]);

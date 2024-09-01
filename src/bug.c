@@ -25,7 +25,7 @@ Bug make_bug(Vector2 pos) {
 
     // init legs
     for (int i = 0; i < BUG_LEG_COUNT; ++i) {
-        init_leg(&b.legs[i], BUG_LEG_SEG_COUNT, BUG_LEG_LENGTH); // @TODO: Hardcoded leg segment length
+        init_leg(&b.legs[i], BUG_LEG_SEG_COUNT, BUG_LEG_LENGTH);
         b.legs[i].start = pos;
     }
     update_leg_anchors(&b);
@@ -99,27 +99,37 @@ void update_bug(Bug* bug) {
         }
     }
 
-    // update legs
-    // make the legs not bend downwards
-    /* for (int i = 0; i < BUG_LEG_COUNT; ++i) { */
-    /*     float leg_seg1_degrees = vector2_degrees(Vector2Subtract(bug->legs[i].segments[0].b, bug->legs[i].segments[0].a)); */
-    /*     if (leg_seg1_degrees > 0.f) { */
-    /*         Vector2 v = {0.f, -1.f}; */
-    /*         bug->legs[i].segments[0].b = Vector2Add(bug->legs[i].segments[0].a, v); */
-    /*     } */
-    /* } */
-
+    /// update legs
     // attach leg end to it's target
     for (int i = 0; i < BUG_LEG_COUNT; ++i) {
         bug->legs[i].end = bug->leg_end_targets[i];
-        update_leg_e2s(&bug->legs[i]);
+        update_leg_start_to_end(&bug->legs[i]);
     }
 
     // attach leg base(start) to body
     for (int i = 0; i < BUG_LEG_COUNT; ++i) {
         bug->legs[i].start = bug->body.pos;
-        update_leg_s2e(&bug->legs[i]);
+        update_leg_end_to_start(&bug->legs[i]);
     }
+
+    /* // make the legs not bend downwards */
+    /* for (int i = 0; i < BUG_LEG_COUNT; ++i) { */
+    /*     float leg_seg1_degrees = vector2_degrees(Vector2Subtract(bug->legs[i].segments[0].b, bug->legs[i].segments[0].a)); */
+    /*     if (leg_seg1_degrees > 0.f) { */
+    /*         Vector2 v = {-bug->legs[i].segments[0].length, 0.f}; */
+    /*         if (leg_seg1_degrees >= 90.f) { */
+    /*             v.x *= -1.f; */
+    /*         } */
+    /*         bug->legs[i].segments[0].b = Vector2Add(bug->legs[i].segments[0].a, v); */
+    /*         for (int j = 1; j < arrlen(bug->legs[i].segments); ++j) { */
+    /*             Segment* seg = &bug->legs[i].segments[j]; */
+    /*             Segment* prev = &bug->legs[i].segments[j-1]; */
+    /*             seg->a = prev->b; */
+    /*             fix_seg_b_to_a(seg); */
+    /*         } */
+    /*     } */
+    /* } */
+
 }
 
 void draw_bug(Bug* bug, bool debug) {
