@@ -1,12 +1,27 @@
 #include <leg.h>
 
 void init_leg(Leg* a, size_t seg_count, float seg_len) {
-    a->segment_length = seg_len;
     a->segment_count  = seg_count;
     arrsetlen(a->segments, seg_count);
     for (int i = 0; i < arrlen(a->segments); ++i) {
         a->segments[i].length = seg_len;
     }
+}
+
+void init_leg_diff_size(Leg* leg, size_t seg_count, float* seg_lens) {
+    leg->segment_count  = seg_count;
+    arrsetlen(leg->segments, seg_count);
+    for (int i = 0; i < arrlen(leg->segments); ++i) {
+        leg->segments[i].length = seg_lens[i];
+    }
+}
+
+float get_leg_length(Leg* leg) {
+    float length = 0.f;
+    for (int i = 0; i < arrlen(leg->segments); ++i) {
+        length += leg->segments[i].length;
+    }
+    return length;
 }
 
 //        a -> start

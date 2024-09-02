@@ -23,15 +23,23 @@ Bug make_bug(Vector2 pos) {
     b.body.color = GetColor(0xFB4934FF);
     b.body.last_dir.x = 1.f;
 
+    float seg_lens[BUG_LEG_SEG_COUNT];
+
+    for (int i = 0; i < BUG_LEG_SEG_COUNT; ++i) {
+        seg_lens[i] = BUG_LEG_SEG_LENGTH * (1.f / (float)(BUG_LEG_SEG_COUNT-i));
+    }
     // init legs
     for (int i = 0; i < BUG_LEG_COUNT; ++i) {
-        init_leg(&b.legs[i], BUG_LEG_SEG_COUNT, BUG_LEG_LENGTH);
+        init_leg_diff_size(&b.legs[i], BUG_LEG_SEG_COUNT, seg_lens);
         b.legs[i].start = pos;
     }
     update_leg_anchors(&b);
     for (int i = 0; i < BUG_LEG_COUNT; ++i) {
         b.leg_end_targets[i] = b.leg_end_anchors[i];
     }
+
+    // STATIC vars
+    b.bug_leg_end_anchor_max_dist = get_leg_length(&b.legs[0]);
 
     return b;
 }
@@ -77,7 +85,7 @@ void update_bug(Bug* bug) {
         float dist_to_end_anchor = Vector2Length(Vector2Subtract(bug->leg_end_anchors[current_leg], bug->leg_end_targets[current_leg]));
         switch (bug->leg_states[current_leg]) {
             case BUG_LEG_STATE_IDLE: {
-                if (dist_to_end_anchor > BUG_LEG_END_ANCHOR_MAX_DIST) {
+                if (dist_to_end_anchor > bug->bug_leg_end_anchor_max_dist) {
                     bug->leg_states[current_leg] = BUG_LEG_STATE_MOVE;
                 }
             } break;
@@ -108,7 +116,10 @@ void update_bug(Bug* bug) {
 
     // attach leg base(start) to body
     for (int i = 0; i < BUG_LEG_COUNT; ++i) {
-        bug->legs[i].start = bug->body.pos;
+        Vector2 last_dir_normal = { -bug->body.last_dir.y, bug->body.last_dir.x };
+        if (i == 1) { last_dir_normal = Vector2Scale(last_dir_normal, -1.f); }
+        last_dir_normal = Vector2Scale(last_dir_normal, BUG_RADIUS);
+        bug->legs[i].start = Vector2Add(bug->body.pos, last_dir_normal);
         update_leg_end_to_start(&bug->legs[i]);
     }
 

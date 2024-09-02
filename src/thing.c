@@ -22,11 +22,17 @@ int main(void) {
     /* Leg a = {0}; */
     /* init_leg(&a, 10, 50.f); */
     /* Vector2 target = {WIDTH*0.5f, HEIGHT*0.5f}; */
+    Camera2D camera = {
+        .offset = { WIDTH*0.5f, HEIGHT*0.5f },
+        .zoom = 1.f
+    };
+    Vector2 camera_target = b.body.pos;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(GetColor(0x181818FF));
         /* Vector2 mpos = GetMousePosition(); */
+        float delta = GetFrameTime();
 
         if (IsKeyPressed(KEY_TAB)) {
             DEBUG_DRAW = !DEBUG_DRAW;
@@ -41,11 +47,18 @@ int main(void) {
 
         update_bug(&b);
 
+        float R = 2.f * delta;
+        camera_target.x = Lerp(camera_target.x, b.body.pos.x, R);
+        camera_target.y = Lerp(camera_target.y, b.body.pos.y, R);
+        camera.target = camera_target;
+
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
         /* draw_leg(&a, DEBUG_DRAW); */
         /* DrawCircleV(target, 12.f, RED); */
 
+        BeginMode2D(camera);
         draw_bug(&b, DEBUG_DRAW);
+        EndMode2D();
 
         // DEBUG
         int y = 0;
