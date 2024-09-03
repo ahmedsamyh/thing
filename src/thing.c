@@ -57,15 +57,13 @@ int main(void) {
 
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
 
-
         BeginMode2D(camera);
             /* draw_tile_grid(camera); */
-            draw_chunk_grid(camera);
+            /* draw_chunk_grid(camera); */
             draw_origin_lines(camera, view_rect);
             draw_bug(&b, DEBUG_DRAW);
             /* DrawRectangleLinesEx(view_rect, 2.f, RED); */
         EndMode2D();
-
 
         // DEBUG
         int y = 0;

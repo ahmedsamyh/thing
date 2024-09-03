@@ -14,11 +14,24 @@ float randomf(float from, float to) {
   return from + (rn * (to - from));
 }
 
+uint8 randomu8(uint8 from, uint8 to) {
+    float rn = ((float)rand() / (float)RAND_MAX);
+    return (uint8)(from + (rn * (to - from)));
+}
+
 float map(float value, float from_min, float from_max, float to_min, float to_max) {
   return to_min + ((to_max - to_min) / (from_max - from_min)) * (value - from_min);
 }
 
 // Raylib
+Vector2 vector2_from_radians(float rad) {
+    Vector2 result = {
+        .x = cosf(rad),
+        .y = sinf(rad),
+    };
+    return result;
+}
+
 Vector2 vector2_from_degrees(float deg) {
     Vector2 result = {
         .x = cosf(DEG2RAD * deg),
