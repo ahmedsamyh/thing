@@ -11,7 +11,8 @@
 #define COMMONLIB_IMPLEMENTATION
 #include <commonlib.h>
 
-void draw_grid(Camera2D camera);
+void draw_tile_grid(Camera2D camera);
+void draw_chunk_grid(Camera2D camera);
 void draw_origin_lines(Camera2D camera, Rectangle view_rect);
 
 int main(void) {
@@ -45,11 +46,6 @@ int main(void) {
 
         //UPDATE////////////////////////////////////////////////////////////////////////////////////////////
 
-        /* a.start = mpos; */
-        /* update_leg_s2e(&a); */
-        /* a.end = target; */
-        /* update_leg_e2s(&a); */
-
         update_bug(&b);
 
         float R = 2.f * delta;
@@ -61,10 +57,10 @@ int main(void) {
 
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
 
-        /* draw_grid(camera); */
-
 
         BeginMode2D(camera);
+            /* draw_tile_grid(camera); */
+            draw_chunk_grid(camera);
             draw_origin_lines(camera, view_rect);
             draw_bug(&b, DEBUG_DRAW);
             /* DrawRectangleLinesEx(view_rect, 2.f, RED); */
@@ -94,9 +90,86 @@ int main(void) {
     return 0;
 }
 
-// TODO: This thing doesn't work the way i want it to work!
-void draw_grid(Camera2D camera) {
-    (void)camera;
+void draw_tile_grid(Camera2D camera) {
+    Vector2 zerozero = { 0.f, 0.f };
+    Vector2 world_topleft = GetScreenToWorld2D(zerozero, camera);
+    Vector2 world_topleft_tile_aligned = {
+        .x = ((int)world_topleft.x / (int)TILE_SIZE)*TILE_SIZE,
+        .y = ((int)world_topleft.y / (int)TILE_SIZE)*TILE_SIZE,
+    };
+
+    for (float y = -1; y < ROWS+1; ++y) {
+        for (float x = -1; x < COLS+1; ++x) {
+            {
+                Vector2 s = {
+                    .x = 0.f,
+                    .y = y * TILE_SIZE
+                };
+                s = Vector2Add(s, world_topleft_tile_aligned);
+                Vector2 e = {
+                    .x = WIDTH,
+                    .y = y * TILE_SIZE
+                };
+                e = Vector2Add(e, world_topleft_tile_aligned);
+                DrawLineV(s, e, ColorAlpha(WHITE, 0.1f));
+            }
+            {
+                Vector2 s = {
+                    .x = x * TILE_SIZE,
+                    .y = 0.f,
+                };
+                s = Vector2Add(s, world_topleft_tile_aligned);
+                Vector2 e = {
+                    .x = x * TILE_SIZE,
+                    .y = HEIGHT,
+                };
+                e = Vector2Add(e, world_topleft_tile_aligned);
+                DrawLineV(s, e, ColorAlpha(WHITE, 0.1f));
+            }
+        }
+    }
+}
+
+// TODO: Still is kinda sketchy
+void draw_chunk_grid(Camera2D camera) {
+    Vector2 zerozero = { 0.f, 0.f };
+    Vector2 world_topleft = GetScreenToWorld2D(zerozero, camera);
+    Vector2 world_topleft_chunk_aligned = {
+        .x = ((int)world_topleft.x / (int)CHUNK_SIZE)*CHUNK_SIZE,
+        .y = ((int)world_topleft.y / (int)CHUNK_SIZE)*CHUNK_SIZE,
+    };
+
+    float threshold = 10.f;
+    for (float y = -threshold; y < ROWS+threshold; ++y) {
+        for (float x = -threshold; x < COLS+threshold; ++x) {
+            {
+                Vector2 s = {
+                    .x = 0.f,
+                    .y = y * CHUNK_SIZE
+                };
+                s = Vector2Add(s, world_topleft_chunk_aligned);
+                Vector2 e = {
+                    .x = WIDTH,
+                    .y = y * CHUNK_SIZE
+                };
+                e = Vector2Add(e, world_topleft_chunk_aligned);
+                DrawLineV(s, e, ColorAlpha(WHITE, 0.1f));
+            }
+            {
+                Vector2 s = {
+                    .x = x * CHUNK_SIZE,
+                    .y = 0.f,
+                };
+                s = Vector2Add(s, world_topleft_chunk_aligned);
+                Vector2 e = {
+                    .x = x * CHUNK_SIZE,
+                    .y = HEIGHT,
+                };
+                e = Vector2Add(e, world_topleft_chunk_aligned);
+                DrawLineV(s, e, ColorAlpha(WHITE, 0.1f));
+            }
+        }
+    }
 }
 
 void draw_origin_lines(Camera2D camera, Rectangle view_rect) {
