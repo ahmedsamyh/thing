@@ -14,6 +14,7 @@
 float deg2rad(float deg);
 float rad2deg(float rad);
 float randomf(float from, float to);
+int   randomi(int from, int to);
 uint8 randomu8(uint8 from, uint8 to);
 
 float map(float value, float from_min, float from_max, float to_min, float to_max);

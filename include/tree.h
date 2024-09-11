@@ -3,26 +3,17 @@
 
 #include <raylib.h>
 #include <commonlib.h>
-
-#define BRANCH_THRESHOLD 34
+#include <leg.h>
 
 STRUCT(Tree);
-STRUCT(Branch);
-
-struct Branch {
-    Vector2 start, end;
-    float length;
-    uint8 branching_value; // will branch if goes above a certain threshold
-};
-
-Branch make_branch(Vector2 start);
 
 struct Tree {
-    Branch* branches; // @dynamic-array
-    Vector2 pos; // base of the tree
+    Leg* legs; // @dynamic-array
+    Vector2 base;
 };
 
-void init_tree(Tree* tree);
+void init_tree(Tree* tree, Vector2 pos);
+void free_tree(Tree* tree);
 void draw_tree(Tree* tree, bool debug);
 
 #endif // __TREE_H__

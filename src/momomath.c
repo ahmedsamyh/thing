@@ -14,6 +14,11 @@ float randomf(float from, float to) {
   return from + (rn * (to - from));
 }
 
+int randomi(int from, int to) {
+  float rn = (float)rand() / (float)RAND_MAX;
+  return from + (rn * (to - from));
+}
+
 uint8 randomu8(uint8 from, uint8 to) {
     float rn = ((float)rand() / (float)RAND_MAX);
     return (uint8)(from + (rn * (to - from)));

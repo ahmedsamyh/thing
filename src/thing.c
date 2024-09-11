@@ -2,11 +2,13 @@
 #include <raymath.h>
 #include <momomath.h>
 #include <stdio.h>
+#include <time.h>
 #include <body.h>
 #include <config.h>
 #include <segment.h>
 #include <leg.h>
 #include <bug.h>
+#include <tree.h>
 
 #define COMMONLIB_IMPLEMENTATION
 #include <commonlib.h>
@@ -15,7 +17,14 @@ void draw_tile_grid(Camera2D camera);
 void draw_chunk_grid(Camera2D camera);
 void draw_origin_lines(Camera2D camera, Rectangle view_rect);
 
+    /* b = make_bug(CLITERAL(Vector2) {WIDTH*0.5f, HEIGHT*0.75f});\ */
+#define RESET() \
+    free_tree(&t);\
+    init_tree(&t, camera.offset)
+
+
 int main(void) {
+    srand(time(NULL));
     InitWindow(WIDTH, HEIGHT, "Thing");
 
     bool DEBUG_DRAW = false;
@@ -34,11 +43,16 @@ int main(void) {
     };
     /* Vector2 world_origin = { 0.f, 0.f }; */
 
+
+    Tree t = {0};
+    init_tree(&t, camera.offset);
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(GetColor(0x181818FF));
-        /* Vector2 mpos = GetMousePosition(); */
         float delta = GetFrameTime();
+        /* Vector2 mpos = GetMousePosition(); */
+        /* Vector2 mpos_world = GetScreenToWorld2D(mpos, camera); */
 
         if (IsKeyPressed(KEY_TAB)) {
             DEBUG_DRAW = !DEBUG_DRAW;
@@ -55,6 +69,13 @@ int main(void) {
         view_rect.x = camera.target.x - camera.offset.x;
         view_rect.y = camera.target.y - camera.offset.y;
 
+        if (IsKeyPressed(KEY_R)) {
+            RESET();
+        }
+
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+        }
+
         //DRAW//////////////////////////////////////////////////////////////////////////////////////////////
 
         BeginMode2D(camera);
@@ -63,6 +84,8 @@ int main(void) {
             draw_origin_lines(camera, view_rect);
             draw_bug(&b, DEBUG_DRAW);
             /* DrawRectangleLinesEx(view_rect, 2.f, RED); */
+
+            draw_tree(&t, DEBUG_DRAW);
         EndMode2D();
 
         // DEBUG
@@ -83,6 +106,7 @@ int main(void) {
         EndDrawing();
     }
 
+    free_tree(&t);
     Arena_free(&str_arena);
     CloseWindow();
     return 0;

@@ -9,6 +9,7 @@ struct Leg {
     Segment* segments;
     size_t segment_count;
     Vector2 start, end;
+    bool last; // NOTE: For tree (if this is a outward leg)
 };
 
 void init_leg(Leg* leg, size_t seg_count, float seg_len);
